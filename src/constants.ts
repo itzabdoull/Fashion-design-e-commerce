@@ -48,5 +48,21 @@ export const PRODUCTS: Product[] = [
     category: "Essentials",
     image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&q=80&w=800",
     description: "Fine-knit merino wool turtleneck in a classic charcoal grey."
+  },
+  {
+    id: "7",
+    name: "Midnight & Crimson Tuxedo",
+    price: 1450,
+    category: "Suits",
+    image: "https://ais-pre-tqcqusggrrk2dz2mp5n5a5-646697486608.europe-west2.run.app/input_file_0.png",
+    description: "A striking black and burgundy three-piece tuxedo with a velvet shawl lapel."
+  },
+  {
+    id: "8",
+    name: "Royal Azure Three-Piece Suit",
+    price: 1100,
+    category: "Suits",
+    image: "https://ais-pre-tqcqusggrrk2dz2mp5n5a5-646697486608.europe-west2.run.app/input_file_1.png",
+    description: "A vibrant royal blue suit tailored for a sharp, modern silhouette."
   }
 ];
