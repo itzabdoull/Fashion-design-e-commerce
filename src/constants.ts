@@ -54,7 +54,7 @@ export const PRODUCTS: Product[] = [
     name: "Midnight & Crimson Tuxedo",
     price: 1450,
     category: "Suits",
-    image: "https://ais-pre-tqcqusggrrk2dz2mp5n5a5-646697486608.europe-west2.run.app/input_file_0.png",
+    image: "/input_file_0.png",
     description: "A striking black and burgundy three-piece tuxedo with a velvet shawl lapel."
   },
   {
@@ -62,7 +62,7 @@ export const PRODUCTS: Product[] = [
     name: "Royal Azure Three-Piece Suit",
     price: 1100,
     category: "Suits",
-    image: "https://ais-pre-tqcqusggrrk2dz2mp5n5a5-646697486608.europe-west2.run.app/input_file_1.png",
+    image: "/input_file_1.png",
     description: "A vibrant royal blue suit tailored for a sharp, modern silhouette."
   }
 ];
