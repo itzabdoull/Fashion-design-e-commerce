@@ -1,5 +1,12 @@
 import { Product } from "./types";
 
+export const CONTACT_INFO = {
+  phone: "+234 91 3086 3203",
+  email: "avdoul32@gmail.com"
+};
+
+const DEFAULT_SIZES = ["XS", "S", "M", "L", "XL"];
+
 export const PRODUCTS: Product[] = [
   {
     id: "1",
@@ -7,7 +14,8 @@ export const PRODUCTS: Product[] = [
     price: 1200,
     category: "Evening Wear",
     image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&q=80&w=800",
-    description: "A floor-length silk gown with a delicate drape and hand-stitched detailing."
+    description: "A floor-length silk gown with a delicate drape and hand-stitched detailing.",
+    sizes: DEFAULT_SIZES
   },
   {
     id: "2",
@@ -15,7 +23,8 @@ export const PRODUCTS: Product[] = [
     price: 850,
     category: "Outerwear",
     image: "https://images.unsplash.com/photo-1539533018447-63fcce2678e3?auto=format&fit=crop&q=80&w=800",
-    description: "Tailored from the finest Italian cashmere, this overcoat offers timeless elegance."
+    description: "Tailored from the finest Italian cashmere, this overcoat offers timeless elegance.",
+    sizes: ["S", "M", "L", "XL"]
   },
   {
     id: "3",
@@ -23,7 +32,8 @@ export const PRODUCTS: Product[] = [
     price: 650,
     category: "Evening Wear",
     image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&q=80&w=800",
-    description: "Deep emerald velvet with a structured silhouette and subtle sheen."
+    description: "Deep emerald velvet with a structured silhouette and subtle sheen.",
+    sizes: DEFAULT_SIZES
   },
   {
     id: "4",
@@ -31,7 +41,8 @@ export const PRODUCTS: Product[] = [
     price: 950,
     category: "Suits",
     image: "https://images.unsplash.com/photo-1594932224828-b4b059b6f6ee?auto=format&fit=crop&q=80&w=800",
-    description: "Breathable linen suit in a soft sand hue, perfect for garden soirées."
+    description: "Breathable linen suit in a soft sand hue, perfect for garden soirées.",
+    sizes: ["46", "48", "50", "52", "54"]
   },
   {
     id: "5",
@@ -39,7 +50,8 @@ export const PRODUCTS: Product[] = [
     price: 320,
     category: "Essentials",
     image: "https://images.unsplash.com/photo-1581044777550-4cfa60707c03?auto=format&fit=crop&q=80&w=800",
-    description: "A versatile bias-cut satin skirt that transitions seamlessly from day to night."
+    description: "A versatile bias-cut satin skirt that transitions seamlessly from day to night.",
+    sizes: DEFAULT_SIZES
   },
   {
     id: "6",
@@ -47,7 +59,8 @@ export const PRODUCTS: Product[] = [
     price: 280,
     category: "Essentials",
     image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&q=80&w=800",
-    description: "Fine-knit merino wool turtleneck in a classic charcoal grey."
+    description: "Fine-knit merino wool turtleneck in a classic charcoal grey.",
+    sizes: DEFAULT_SIZES
   },
   {
     id: "7",
@@ -55,7 +68,8 @@ export const PRODUCTS: Product[] = [
     price: 1450,
     category: "Suits",
     image: "/input_file_0.png",
-    description: "A striking black and burgundy three-piece tuxedo with a velvet shawl lapel."
+    description: "A striking black and burgundy three-piece tuxedo with a velvet shawl lapel.",
+    sizes: ["46", "48", "50", "52", "54"]
   },
   {
     id: "8",
@@ -63,6 +77,7 @@ export const PRODUCTS: Product[] = [
     price: 1100,
     category: "Suits",
     image: "/input_file_1.png",
-    description: "A vibrant royal blue suit tailored for a sharp, modern silhouette."
+    description: "A vibrant royal blue suit tailored for a sharp, modern silhouette.",
+    sizes: ["46", "48", "50", "52", "54"]
   }
 ];

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Menu, X, Trash2, Plus, Minus } from 'lucide-react';
+import { ShoppingBag, Menu, X, Trash2, Plus, Minus, ArrowLeft, Phone, Mail } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { PRODUCTS } from './constants';
+import { PRODUCTS, CONTACT_INFO } from './constants';
 import { Product, CartItem } from './types';
 import { cn } from './lib/utils';
 
@@ -10,29 +10,35 @@ export default function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
   const categories = ['All', ...new Set(PRODUCTS.map(p => p.category))];
 
-  const addToCart = (product: Product) => {
+  const addToCart = (product: Product, size?: string | null) => {
     setCart(prev => {
-      const existing = prev.find(item => item.id === product.id);
+      const cartItemId = size ? `${product.id}-${size}` : product.id;
+      const existing = prev.find(item => (item.id === product.id && (item as any).selectedSize === size));
+      
       if (existing) {
         return prev.map(item =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          (item.id === product.id && (item as any).selectedSize === size) 
+            ? { ...item, quantity: item.quantity + 1 } 
+            : item
         );
       }
-      return [...prev, { ...product, quantity: 1 }];
+      return [...prev, { ...product, quantity: 1, selectedSize: size } as any];
     });
     setIsCartOpen(true);
   };
 
-  const removeFromCart = (id: string) => {
-    setCart(prev => prev.filter(item => item.id !== id));
+  const removeFromCart = (id: string, size?: string) => {
+    setCart(prev => prev.filter(item => !(item.id === id && (item as any).selectedSize === size)));
   };
 
-  const updateQuantity = (id: string, delta: number) => {
+  const updateQuantity = (id: string, size: string | undefined, delta: number) => {
     setCart(prev => prev.map(item => {
-      if (item.id === id) {
+      if (item.id === id && (item as any).selectedSize === size) {
         const newQty = Math.max(1, item.quantity + delta);
         return { ...item, quantity: newQty };
       }
@@ -47,6 +53,12 @@ export default function App() {
     ? PRODUCTS 
     : PRODUCTS.filter(p => p.category === selectedCategory);
 
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+    setSelectedSize(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navigation */}
@@ -60,12 +72,16 @@ export default function App() {
           </button>
 
           <div className="hidden lg:flex gap-8 text-xs uppercase tracking-widest font-medium">
+            <button onClick={() => { setSelectedProduct(null); setSelectedCategory('All'); }} className="hover:opacity-50 transition-opacity uppercase">Shop</button>
             <a href="#collections" className="hover:opacity-50 transition-opacity">Collections</a>
             <a href="#about" className="hover:opacity-50 transition-opacity">About</a>
             <a href="#contact" className="hover:opacity-50 transition-opacity">Contact</a>
           </div>
 
-          <h1 className="text-2xl lg:text-3xl font-serif tracking-tighter absolute left-1/2 -translate-x-1/2">
+          <h1 
+            className="text-2xl lg:text-3xl font-serif tracking-tighter absolute left-1/2 -translate-x-1/2 cursor-pointer"
+            onClick={() => setSelectedProduct(null)}
+          >
             AURELIA COUTURE
           </h1>
 
@@ -99,6 +115,7 @@ export default function App() {
               <X className="w-8 h-8" />
             </button>
             <div className="flex flex-col gap-8 mt-12 text-4xl font-serif">
+              <button className="text-left" onClick={() => { setSelectedProduct(null); setIsMenuOpen(false); }}>Shop</button>
               <a href="#collections" onClick={() => setIsMenuOpen(false)}>Collections</a>
               <a href="#about" onClick={() => setIsMenuOpen(false)}>About</a>
               <a href="#contact" onClick={() => setIsMenuOpen(false)}>Contact</a>
@@ -107,118 +124,202 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Hero Section */}
-      <header className="relative h-screen flex items-center justify-center overflow-hidden pt-20">
-        <motion.div 
-          initial={{ scale: 1.1, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1.5 }}
-          className="absolute inset-0 z-0"
-        >
-          <img 
-            src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&q=80&w=2000" 
-            alt="Hero Fashion" 
-            className="w-full h-full object-cover brightness-75"
-            referrerPolicy="no-referrer"
-          />
-        </motion.div>
-        
-        <div className="relative z-10 text-center text-white px-6">
-          <motion.p 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="uppercase tracking-[0.3em] text-sm mb-4"
-          >
-            Spring / Summer 2026
-          </motion.p>
-          <motion.h2 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.7 }}
-            className="text-6xl md:text-8xl lg:text-9xl font-serif mb-8 leading-none"
-          >
-            The Ethereal <br /> Collection
-          </motion.h2>
-          <motion.button 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.9 }}
-            className="px-12 py-4 border border-white hover:bg-white hover:text-brand-ink transition-all duration-500 uppercase tracking-widest text-xs"
-            onClick={() => document.getElementById('collections')?.scrollIntoView({ behavior: 'smooth' })}
-          >
-            Explore Now
-          </motion.button>
-        </div>
-      </header>
-
-      {/* Collections Section */}
-      <main id="collections" className="max-w-7xl mx-auto px-6 py-24 w-full">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
-          <div>
-            <h2 className="text-4xl md:text-6xl font-serif mb-4">Curated Pieces</h2>
-            <p className="text-brand-ink/60 max-w-md">
-              Discover our latest collection of hand-crafted garments, designed with precision and passion.
-            </p>
-          </div>
-          
-          <div className="flex flex-wrap gap-4">
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={cn(
-                  "px-6 py-2 rounded-full text-xs uppercase tracking-widest border transition-all",
-                  selectedCategory === cat 
-                    ? "bg-brand-ink text-white border-brand-ink" 
-                    : "border-brand-ink/20 hover:border-brand-ink"
-                )}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-          {filteredProducts.map((product, idx) => (
-            <motion.div 
-              key={product.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1 }}
-              className="group cursor-pointer"
+      {/* Main Content */}
+      <main className="flex-1 pt-20">
+        <AnimatePresence mode="wait">
+          {!selectedProduct ? (
+            <motion.div
+              key="shop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
             >
-              <div className="relative aspect-[3/4] overflow-hidden mb-6 bg-gray-100">
-                <img 
-                  src={product.image} 
-                  alt={product.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-brand-ink/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      addToCart(product);
-                    }}
-                    className="bg-white text-brand-ink px-8 py-3 uppercase tracking-widest text-[10px] font-bold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300"
+              {/* Hero Section */}
+              <header className="relative h-[80vh] flex items-center justify-center overflow-hidden">
+                <motion.div 
+                  initial={{ scale: 1.1, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 1.5 }}
+                  className="absolute inset-0 z-0"
+                >
+                  <img 
+                    src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&q=80&w=2000" 
+                    alt="Hero Fashion" 
+                    className="w-full h-full object-cover brightness-75"
+                    referrerPolicy="no-referrer"
+                  />
+                </motion.div>
+                
+                <div className="relative z-10 text-center text-white px-6">
+                  <motion.p 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="uppercase tracking-[0.3em] text-sm mb-4"
                   >
-                    Add to Cart
-                  </button>
+                    Spring / Summer 2026
+                  </motion.p>
+                  <motion.h2 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.7 }}
+                    className="text-6xl md:text-8xl lg:text-9xl font-serif mb-8 leading-none"
+                  >
+                    The Ethereal <br /> Collection
+                  </motion.h2>
+                  <motion.button 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.9 }}
+                    className="px-12 py-4 border border-white hover:bg-white hover:text-brand-ink transition-all duration-500 uppercase tracking-widest text-xs"
+                    onClick={() => document.getElementById('collections')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Explore Now
+                  </motion.button>
                 </div>
-              </div>
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-[10px] uppercase tracking-widest text-brand-ink/40 mb-1">{product.category}</p>
-                  <h3 className="text-xl font-serif">{product.name}</h3>
+              </header>
+
+              {/* Collections Section */}
+              <section id="collections" className="max-w-7xl mx-auto px-6 py-24 w-full">
+                <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
+                  <div>
+                    <h2 className="text-4xl md:text-6xl font-serif mb-4">Curated Pieces</h2>
+                    <p className="text-brand-ink/60 max-w-md">
+                      Discover our latest collection of hand-crafted garments, designed with precision and passion.
+                    </p>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-4">
+                    {categories.map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        className={cn(
+                          "px-6 py-2 rounded-full text-xs uppercase tracking-widest border transition-all",
+                          selectedCategory === cat 
+                            ? "bg-brand-ink text-white border-brand-ink" 
+                            : "border-brand-ink/20 hover:border-brand-ink"
+                        )}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <p className="font-medium">${product.price}</p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+                  {filteredProducts.map((product, idx) => (
+                    <motion.div 
+                      key={product.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="group cursor-pointer"
+                      onClick={() => handleProductClick(product)}
+                    >
+                      <div className="relative aspect-[3/4] overflow-hidden mb-6 bg-gray-100">
+                        <img 
+                          src={product.image} 
+                          alt={product.name}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          referrerPolicy="no-referrer"
+                        />
+                        <div className="absolute inset-0 bg-brand-ink/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                          <span className="bg-white text-brand-ink px-8 py-3 uppercase tracking-widest text-[10px] font-bold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                            View Details
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-widest text-brand-ink/40 mb-1">{product.category}</p>
+                          <h3 className="text-xl font-serif">{product.name}</h3>
+                        </div>
+                        <p className="font-medium">${product.price}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </section>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="detail"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="max-w-7xl mx-auto px-6 py-12 lg:py-24"
+            >
+              <button 
+                onClick={() => setSelectedProduct(null)}
+                className="flex items-center gap-2 text-xs uppercase tracking-widest mb-12 hover:opacity-50 transition-opacity"
+              >
+                <ArrowLeft className="w-4 h-4" /> Back to Shop
+              </button>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <div className="aspect-[3/4] bg-gray-100 overflow-hidden">
+                  <img 
+                    src={selectedProduct.image} 
+                    alt={selectedProduct.name} 
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+                
+                <div className="flex flex-col justify-center">
+                  <p className="text-xs uppercase tracking-[0.3em] text-brand-ink/40 mb-4">{selectedProduct.category}</p>
+                  <h2 className="text-5xl md:text-7xl font-serif mb-6">{selectedProduct.name}</h2>
+                  <p className="text-2xl font-serif mb-8">${selectedProduct.price}</p>
+                  
+                  <div className="space-y-8">
+                    <div>
+                      <h4 className="text-xs uppercase tracking-widest font-bold mb-4">Description</h4>
+                      <p className="text-brand-ink/60 leading-relaxed font-light">
+                        {selectedProduct.description}
+                      </p>
+                    </div>
+
+                    {selectedProduct.sizes && (
+                      <div>
+                        <h4 className="text-xs uppercase tracking-widest font-bold mb-4">Select Size</h4>
+                        <div className="flex flex-wrap gap-3">
+                          {selectedProduct.sizes.map(size => (
+                            <button
+                              key={size}
+                              onClick={() => setSelectedSize(size)}
+                              className={cn(
+                                "w-12 h-12 flex items-center justify-center text-xs border transition-all",
+                                selectedSize === size 
+                                  ? "bg-brand-ink text-white border-brand-ink" 
+                                  : "border-brand-ink/10 hover:border-brand-ink"
+                              )}
+                            >
+                              {size}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <button 
+                      onClick={() => addToCart(selectedProduct, selectedSize)}
+                      className="w-full bg-brand-ink text-white py-5 uppercase tracking-widest text-xs font-bold hover:bg-brand-ink/90 transition-colors"
+                    >
+                      Add to Bag
+                    </button>
+                    
+                    <div className="pt-8 border-t border-brand-ink/10 text-[10px] uppercase tracking-widest text-brand-ink/40 space-y-2">
+                      <p>Complimentary Shipping on all orders</p>
+                      <p>Ethically sourced and hand-crafted</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </motion.div>
-          ))}
-        </div>
+          )}
+        </AnimatePresence>
       </main>
 
       {/* About Section */}
@@ -240,11 +341,6 @@ export default function App() {
             <p className="text-lg text-white/70 leading-relaxed font-light">
               We believe that clothing is more than just fabric; it is an extension of one's identity. Our designs are meant to empower, inspire, and endure through generations.
             </p>
-            <div className="pt-4">
-              <button className="px-10 py-4 border border-white/30 hover:border-white transition-colors uppercase tracking-widest text-xs">
-                Read Our Story
-              </button>
-            </div>
           </div>
         </div>
       </section>
@@ -257,15 +353,25 @@ export default function App() {
             <p className="text-sm text-brand-ink/60 leading-relaxed">
               Redefining luxury through conscious design and timeless elegance.
             </p>
+            <div className="space-y-2 pt-4">
+              <div className="flex items-center gap-3 text-sm text-brand-ink/60">
+                <Phone className="w-4 h-4" />
+                <span>{CONTACT_INFO.phone}</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm text-brand-ink/60">
+                <Mail className="w-4 h-4" />
+                <a href={`mailto:${CONTACT_INFO.email}`} className="hover:text-brand-ink transition-colors">{CONTACT_INFO.email}</a>
+              </div>
+            </div>
           </div>
           
           <div>
             <h4 className="text-xs uppercase tracking-widest font-bold mb-6">Shop</h4>
             <ul className="space-y-4 text-sm text-brand-ink/60">
-              <li><a href="#" className="hover:text-brand-ink transition-colors">New Arrivals</a></li>
-              <li><a href="#" className="hover:text-brand-ink transition-colors">Evening Wear</a></li>
-              <li><a href="#" className="hover:text-brand-ink transition-colors">Accessories</a></li>
-              <li><a href="#" className="hover:text-brand-ink transition-colors">Bespoke Service</a></li>
+              <li><button onClick={() => { setSelectedProduct(null); setSelectedCategory('All'); }} className="hover:text-brand-ink transition-colors">New Arrivals</button></li>
+              <li><button onClick={() => { setSelectedProduct(null); setSelectedCategory('Evening Wear'); }} className="hover:text-brand-ink transition-colors">Evening Wear</button></li>
+              <li><button onClick={() => { setSelectedProduct(null); setSelectedCategory('Suits'); }} className="hover:text-brand-ink transition-colors">Suits</button></li>
+              <li><button onClick={() => { setSelectedProduct(null); setSelectedCategory('Essentials'); }} className="hover:text-brand-ink transition-colors">Essentials</button></li>
             </ul>
           </div>
 
@@ -339,8 +445,8 @@ export default function App() {
                     <p className="uppercase tracking-widest text-xs">Your bag is empty</p>
                   </div>
                 ) : (
-                  cart.map(item => (
-                    <div key={item.id} className="flex gap-4">
+                  cart.map((item, idx) => (
+                    <div key={`${item.id}-${(item as any).selectedSize || idx}`} className="flex gap-4">
                       <div className="w-24 aspect-[3/4] bg-gray-100 overflow-hidden">
                         <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                       </div>
@@ -348,19 +454,22 @@ export default function App() {
                         <div>
                           <div className="flex justify-between items-start">
                             <h4 className="font-serif text-lg">{item.name}</h4>
-                            <button onClick={() => removeFromCart(item.id)} className="text-brand-ink/40 hover:text-brand-ink">
+                            <button onClick={() => removeFromCart(item.id, (item as any).selectedSize)} className="text-brand-ink/40 hover:text-brand-ink">
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                           <p className="text-sm text-brand-ink/60">${item.price}</p>
+                          {(item as any).selectedSize && (
+                            <p className="text-[10px] uppercase tracking-widest text-brand-ink/40 mt-1">Size: {(item as any).selectedSize}</p>
+                          )}
                         </div>
                         <div className="flex items-center gap-4">
                           <div className="flex items-center border border-brand-ink/10 rounded-full px-2 py-1">
-                            <button onClick={() => updateQuantity(item.id, -1)} className="p-1 hover:opacity-50">
+                            <button onClick={() => updateQuantity(item.id, (item as any).selectedSize, -1)} className="p-1 hover:opacity-50">
                               <Minus className="w-3 h-3" />
                             </button>
                             <span className="w-8 text-center text-xs font-medium">{item.quantity}</span>
-                            <button onClick={() => updateQuantity(item.id, 1)} className="p-1 hover:opacity-50">
+                            <button onClick={() => updateQuantity(item.id, (item as any).selectedSize, 1)} className="p-1 hover:opacity-50">
                               <Plus className="w-3 h-3" />
                             </button>
                           </div>
